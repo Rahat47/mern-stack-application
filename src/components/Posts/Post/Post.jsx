@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import useStyles from "./styles";
 import moment from "moment";
 import {
@@ -8,76 +8,121 @@ import {
     CardContent,
     Button,
     Typography,
+    Tooltip,
+    Divider,
+    Collapse,
+    IconButton,
 } from "@material-ui/core";
+import clsx from "clsx";
 
-import { ThumbUpAlt, Delete, MoreHoriz } from "@material-ui/icons";
+import { ThumbUpAlt, Delete, MoreHoriz, ExpandMore } from "@material-ui/icons";
 import { useDispatch } from "react-redux";
 import { deletePost, likePost } from "../../../actions/posts";
 
 const Post = ({ post, setCurrentId }) => {
     const dispatch = useDispatch();
-
+    const [expanded, setExpanded] = useState(false);
     const classes = useStyles();
+    const handleExpandClick = () => {
+        setExpanded(!expanded);
+    };
+
     return (
         <Card raised className={classes.card}>
             <CardMedia
                 className={classes.media}
-                image={post.selectedFile}
+                image={
+                    post.selectedFile ||
+                    "https://user-images.githubusercontent.com/194400/49531010-48dad180-f8b1-11e8-8d89-1e61320e1d82.png"
+                }
                 title={post.title}
             />
             <div className={classes.overlay}>
-                <Typography variant="h6">{post.creator}</Typography>
+                <Tooltip title="Creator of the post" placement="top">
+                    <Typography variant="h6">{post.creator}</Typography>
+                </Tooltip>
                 <Typography variant="body2">
                     {moment(post.createdAt).fromNow()}
                 </Typography>
             </div>
             <div className={classes.overlay2}>
-                <Button
-                    style={{ color: "white" }}
-                    size="small"
-                    onClick={() => {
-                        setCurrentId(post._id);
-                    }}
+                <Tooltip
+                    title="Edit Post"
+                    aria-label="Edit Post"
+                    placement="top"
                 >
-                    <MoreHoriz fontSize="default" />
-                </Button>
+                    <Button
+                        style={{ color: "white" }}
+                        size="small"
+                        onClick={() => {
+                            setCurrentId(post._id);
+                        }}
+                    >
+                        <MoreHoriz fontSize="default" />
+                    </Button>
+                </Tooltip>
             </div>
 
-            <div className={classes.details}>
-                <Typography variant="body2" color="textSecondary">
-                    {post.tags.map(tag => `#${tag} `)}
-                </Typography>
-            </div>
+            {post.tags[0] && (
+                <div className={classes.details}>
+                    <Typography variant="body2" color="textSecondary">
+                        {post.tags.map(tag => (tag ? `#${tag} ` : ""))}
+                    </Typography>
+                </div>
+            )}
 
             <Typography className={classes.title} variant="h5" gutterBottom>
                 {post.title}
             </Typography>
+            <Divider />
 
-            <CardContent>
-                <Typography variant="body2" component="p" color="textSecondary">
-                    {post.message}
-                </Typography>
-            </CardContent>
             <CardActions className={classes.cardActions}>
-                <Button
-                    color="primary"
-                    onClick={() => dispatch(likePost(post._id))}
-                    size="small"
-                >
-                    <ThumbUpAlt fontSize="small" /> &nbsp; Like &nbsp;{" "}
-                    {post.likeCount}
-                </Button>
+                <Tooltip title="Like Post">
+                    <Button
+                        color="primary"
+                        onClick={() => dispatch(likePost(post._id))}
+                        size="small"
+                    >
+                        <ThumbUpAlt fontSize="small" /> &nbsp; Like &nbsp;{" "}
+                        {post.likeCount}
+                    </Button>
+                </Tooltip>
 
-                <Button
-                    color="primary"
-                    onClick={() => {
-                        dispatch(deletePost(post._id));
-                    }}
-                    size="small"
-                >
-                    <Delete fontSize="small" /> Delete
-                </Button>
+                <Tooltip title="Delete The Post" placement="top">
+                    <Button
+                        color="secondary"
+                        onClick={() => {
+                            dispatch(deletePost(post._id));
+                        }}
+                        size="small"
+                    >
+                        <Delete fontSize="small" /> Delete
+                    </Button>
+                </Tooltip>
+                <Tooltip title="Show Details">
+                    <IconButton
+                        className={clsx(classes.expand, {
+                            [classes.expandOpen]: expanded,
+                        })}
+                        onClick={handleExpandClick}
+                        aria-expanded={expanded}
+                        aria-label="show more"
+                    >
+                        <ExpandMore />
+                    </IconButton>
+                </Tooltip>
             </CardActions>
+            <Collapse in={expanded} timeout="auto" unmountOnExit>
+                <CardContent>
+                    <Typography
+                        variant="body2"
+                        component="p"
+                        color="textSecondary"
+                    >
+                        {post.message}
+                    </Typography>
+                </CardContent>
+            </Collapse>
         </Card>
     );
 };
