@@ -32,6 +32,7 @@ const Auth = () => {
 
     const [showPassword, setShowPassword] = useState(false);
 
+    // eslint-disable-next-line no-unused-vars
     const [formData, setFormData] = useState(initialState);
 
     //!FUNCTIONS
