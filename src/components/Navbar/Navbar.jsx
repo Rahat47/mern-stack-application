@@ -21,11 +21,13 @@ const Navbar = () => {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line no-unused-vars
         const token = user?.token;
 
         //JWT
 
         setUser(JSON.parse(localStorage.getItem("profile")));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location]);
 
     return (
