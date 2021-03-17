@@ -19,6 +19,11 @@ const App = () => {
     useEffect(() => {
         dispatch(getPosts())
     }, [dispatch, currentId])
+    const [snackOpen, setSnackOpen] = useState({
+        open: false,
+        severity: "",
+        message: "",
+    });
 
 
     return (
@@ -31,10 +36,10 @@ const App = () => {
                 <Container>
                     <Grid className={classes.mainContainer} container justify="space-between" alignItems="stretch" spacing={3}>
                         <Grid item xs={12} sm={7}>
-                            <Posts setCurrentId={setCurrentId} />
+                            <Posts snackOpen={snackOpen} setSnackOpen={setSnackOpen} setCurrentId={setCurrentId} />
                         </Grid>
                         <Grid item xs={12} sm={4}>
-                            <Form setCurrentId={setCurrentId} currentId={currentId} />
+                            <Form snackOpen={snackOpen} setSnackOpen={setSnackOpen} setCurrentId={setCurrentId} currentId={currentId} />
                         </Grid>
                     </Grid>
                 </Container>
