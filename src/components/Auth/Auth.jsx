@@ -14,7 +14,7 @@ import Input from "./Input";
 import Icon from "./Icon";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
-
+import { signin, signup } from "../../actions/auth";
 const initialState = {
     firstName: "",
     lastName: "",
@@ -32,13 +32,17 @@ const Auth = () => {
 
     const [showPassword, setShowPassword] = useState(false);
 
-    // eslint-disable-next-line no-unused-vars
     const [formData, setFormData] = useState(initialState);
 
     //!FUNCTIONS
     const handleSubmit = e => {
         e.preventDefault();
-        console.log(formData);
+
+        if (isSignUp) {
+            dispatch(signup(formData, history));
+        } else {
+            dispatch(signin(formData, history));
+        }
     };
 
     const switchMode = () => {
@@ -46,10 +50,14 @@ const Auth = () => {
         setShowPassword(false);
     };
 
-    const handleShowPassword = () =>
+    const handleShowPassword = () => {
+        console.log(showPassword);
         setShowPassword(prevShowPassword => !prevShowPassword);
+    };
 
-    const handleChange = () => {};
+    const handleChange = e => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
     const googleSuccess = async res => {
         console.log(res);
@@ -76,34 +84,38 @@ const Auth = () => {
                 <Typography variant="h5">
                     {isSignUp ? "Sign Up" : "Sign In"}
                 </Typography>
-                <form className={classes.form} onSubmit={e => handleSubmit(e)}>
+                <form
+                    autoComplete="off"
+                    className={classes.form}
+                    onSubmit={e => handleSubmit(e)}
+                >
                     <Grid container spacing={2}>
                         {isSignUp && (
                             <>
                                 <Input
                                     name="firstName"
                                     label="First Name"
-                                    handleChange={handleChange}
+                                    handleChange={e => handleChange(e)}
                                     half
                                     autoFocus
                                 />
                                 <Input
                                     name="lastName"
                                     label="Last Name"
-                                    handleChange={handleChange}
+                                    handleChange={e => handleChange(e)}
                                     half
                                 />
                             </>
                         )}
                         <Input
                             type="email"
-                            handleChange={handleChange}
+                            handleChange={e => handleChange(e)}
                             name="email"
                             label="Email Address"
                         />
                         <Input
                             type={showPassword ? "text" : "password"}
-                            handleChange={handleChange}
+                            handleChange={e => handleChange(e)}
                             name="password"
                             label="Password"
                             handleShowPassword={handleShowPassword}
@@ -112,7 +124,7 @@ const Auth = () => {
                             <Input
                                 name="confirmPassword"
                                 label="Repeat Password"
-                                handleChange={handleChange}
+                                handleChange={e => handleChange(e)}
                                 type="password"
                             />
                         )}

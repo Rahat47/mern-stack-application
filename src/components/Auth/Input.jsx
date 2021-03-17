@@ -17,6 +17,7 @@ const Input = ({
                 onChange={handleChange}
                 variant="outlined"
                 required
+                type={type}
                 aria-required
                 fullWidth
                 label={label}
