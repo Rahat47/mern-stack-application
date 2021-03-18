@@ -14,7 +14,6 @@ import { createPost, updatePost } from "../../actions/posts";
 
 const Form = ({ currentId, setCurrentId, setSnackOpen, snackOpen }) => {
     const [postData, setPostData] = useState({
-        creator: "",
         title: "",
         message: "",
         tags: "",
@@ -27,13 +26,15 @@ const Form = ({ currentId, setCurrentId, setSnackOpen, snackOpen }) => {
     const dispatch = useDispatch();
     const classes = useStyles();
 
+    const user = JSON.parse(localStorage.getItem("profile"));
+
     useEffect(() => {
         if (post) setPostData(post);
     }, [post]);
 
     const handleSubmit = e => {
         e.preventDefault();
-        if (!postData.creator || !postData.title || !postData.message) {
+        if (!postData.title || !postData.message) {
             setSnackOpen({
                 open: true,
                 severity: "warning",
@@ -42,14 +43,16 @@ const Form = ({ currentId, setCurrentId, setSnackOpen, snackOpen }) => {
             return;
         }
         if (currentId) {
-            dispatch(updatePost(currentId, postData));
+            dispatch(
+                updatePost(currentId, { ...postData, name: user?.result?.name })
+            );
             setSnackOpen({
                 open: true,
                 severity: "info",
                 message: "Post is being Edited",
             });
         } else {
-            dispatch(createPost(postData));
+            dispatch(createPost({ ...postData, name: user?.result?.name }));
             setSnackOpen({
                 open: true,
                 severity: "info",
@@ -76,13 +79,24 @@ const Form = ({ currentId, setCurrentId, setSnackOpen, snackOpen }) => {
     const clear = () => {
         setCurrentId(null);
         setPostData({
-            creator: "",
             title: "",
             message: "",
             tags: "",
             selectedFile: "",
         });
     };
+
+    if (!user?.result?.name) {
+        return (
+            <Paper className={classes.paper}>
+                <Typography variant="h6" align="center">
+                    Please Sign-Up or Log-in to Create Memories, and Like
+                    other's Memories
+                </Typography>
+            </Paper>
+        );
+    }
+
     return (
         <Paper className={classes.paper}>
             <Snackbar
@@ -105,16 +119,7 @@ const Form = ({ currentId, setCurrentId, setSnackOpen, snackOpen }) => {
                 <Typography variant="h6">
                     {currentId ? "Editing" : "Creating"} a Memory
                 </Typography>
-                <TextField
-                    name="creator"
-                    variant="outlined"
-                    label="Creator"
-                    fullWidth
-                    value={postData.creator}
-                    onChange={e =>
-                        setPostData({ ...postData, creator: e.target.value })
-                    }
-                />
+
                 <TextField
                     name="title"
                     variant="outlined"

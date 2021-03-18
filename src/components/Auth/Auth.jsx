@@ -27,7 +27,7 @@ const Auth = () => {
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const [isSignUp, setIsSignUp] = useState(true);
+    const [isSignUp, setIsSignUp] = useState(false);
     const classes = useStyles();
 
     const [showPassword, setShowPassword] = useState(false);
@@ -51,7 +51,6 @@ const Auth = () => {
     };
 
     const handleShowPassword = () => {
-        console.log(showPassword);
         setShowPassword(prevShowPassword => !prevShowPassword);
     };
 
@@ -60,7 +59,6 @@ const Auth = () => {
     };
 
     const googleSuccess = async res => {
-        console.log(res);
         const result = res?.profileObj;
         const token = res?.tokenId;
         try {
