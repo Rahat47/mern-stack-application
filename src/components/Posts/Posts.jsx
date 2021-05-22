@@ -1,34 +1,26 @@
 import React from "react";
+import { Grid, CircularProgress } from "@material-ui/core";
 import { useSelector } from "react-redux";
+
 import Post from "./Post/Post";
 import useStyles from "./styles";
-import { CircularProgress, Grid } from "@material-ui/core";
 
-const Posts = ({ setCurrentId, setSnackOpen, snackOpen }) => {
-    const posts = useSelector(state => {
-        return state.posts;
-    });
-
+const Posts = ({ setCurrentId }) => {
+    const posts = useSelector(state => state.posts);
     const classes = useStyles();
+
     return !posts.length ? (
-        <Grid container justify="center">
-            <CircularProgress color="secondary" />
-        </Grid>
+        <CircularProgress color="secondary" />
     ) : (
         <Grid
-            className={classes.mainContainer}
+            className={classes.container}
             container
-            alignContent="stretch"
+            alignItems="stretch"
             spacing={3}
         >
             {posts.map(post => (
-                <Grid item key={post._id} xs={12} sm={6}>
-                    <Post
-                        snackOpen={snackOpen}
-                        setSnackOpen={setSnackOpen}
-                        post={post}
-                        setCurrentId={setCurrentId}
-                    />
+                <Grid key={post._id} item xs={12} sm={6} md={6}>
+                    <Post post={post} setCurrentId={setCurrentId} />
                 </Grid>
             ))}
         </Grid>

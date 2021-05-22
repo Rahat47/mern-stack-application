@@ -1,39 +1,26 @@
-import React, { useState } from "react";
-import useStyles from "./styles";
-import moment from "moment";
+import React from "react";
 import {
     Card,
     CardActions,
-    CardMedia,
     CardContent,
+    CardMedia,
     Button,
     Typography,
-    Tooltip,
-    Divider,
-    Collapse,
-    Snackbar,
-    IconButton,
-} from "@material-ui/core";
-import clsx from "clsx";
-import MuiAlert from "@material-ui/lab/Alert";
-
-import {
-    ThumbUpAlt,
-    ThumbUpAltOutlined,
-    Delete,
-    MoreHoriz,
-    ExpandMore,
-} from "@material-ui/icons";
+} from "@material-ui/core/";
+import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
+import DeleteIcon from "@material-ui/icons/Delete";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import ThumbUpAltOutlined from "@material-ui/icons/ThumbUpAltOutlined";
 import { useDispatch } from "react-redux";
-import { deletePost, likePost } from "../../../actions/posts";
+import moment from "moment";
 
-const Post = ({ post, setCurrentId, setSnackOpen, snackOpen }) => {
+import { likePost, deletePost } from "../../../actions/posts";
+import useStyles from "./styles";
+
+const Post = ({ post, setCurrentId }) => {
     const dispatch = useDispatch();
-
-    const user = JSON.parse(localStorage.getItem("profile"));
-    const [expanded, setExpanded] = useState(false);
-
     const classes = useStyles();
+    const user = JSON.parse(localStorage.getItem("profile"));
 
     const Likes = () => {
         if (post.likes.length > 0) {
@@ -41,7 +28,7 @@ const Post = ({ post, setCurrentId, setSnackOpen, snackOpen }) => {
                 like => like === (user?.result?.googleId || user?.result?._id)
             ) ? (
                 <>
-                    <ThumbUpAlt fontSize="small" />
+                    <ThumbUpAltIcon fontSize="small" />
                     &nbsp;
                     {post.likes.length > 2
                         ? `You and ${post.likes.length - 1} others`
@@ -66,36 +53,8 @@ const Post = ({ post, setCurrentId, setSnackOpen, snackOpen }) => {
         );
     };
 
-    const handleExpandClick = () => {
-        setExpanded(!expanded);
-    };
-
-    function Alert(props) {
-        return <MuiAlert elevation={6} variant="filled" {...props} />;
-    }
-
-    const handleClose = (event, reason) => {
-        if (reason === "clickaway") {
-            return;
-        }
-
-        setSnackOpen({
-            open: false,
-        });
-    };
-
     return (
-        <Card raised className={classes.card}>
-            <Snackbar
-                open={snackOpen.open}
-                autoHideDuration={6000}
-                onClose={handleClose}
-                anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            >
-                <Alert onClose={handleClose} severity={snackOpen.severity}>
-                    {snackOpen.message}
-                </Alert>
-            </Snackbar>
+        <Card className={classes.card}>
             <CardMedia
                 className={classes.media}
                 image={
@@ -104,116 +63,66 @@ const Post = ({ post, setCurrentId, setSnackOpen, snackOpen }) => {
                 }
                 title={post.title}
             />
-            <CardContent>
-                <div className={classes.overlay}>
-                    <Tooltip
-                        title={
-                            post?.name
-                                ? "Creator Of the Post "
-                                : "Posted Before Authentication Applied"
-                        }
-                        placement="top"
-                    >
-                        <Typography variant="h6">
-                            {post.name || "UnAuthenticated Users"}
-                        </Typography>
-                    </Tooltip>
-                    <Typography variant="body2">
-                        {moment(post.createdAt).fromNow()}
-                    </Typography>
-                </div>
-                {(user?.result?.googleId === post?.creator ||
-                    user?.result?._id === post?.creator) && (
-                    <div className={classes.overlay2}>
-                        <Tooltip
-                            title="Edit Post"
-                            aria-label="Edit Post"
-                            placement="top"
-                        >
-                            <Button
-                                style={{ color: "white" }}
-                                size="small"
-                                onClick={() => {
-                                    setCurrentId(post._id);
-                                }}
-                            >
-                                <MoreHoriz fontSize="default" />
-                            </Button>
-                        </Tooltip>
-                    </div>
-                )}
-
-                {post.tags[0] && (
-                    <div className={classes.details}>
-                        <Typography variant="body2" color="textSecondary">
-                            {post.tags.map(tag => (tag ? `#${tag} ` : ""))}
-                        </Typography>
-                    </div>
-                )}
-
-                <Typography className={classes.title} variant="h5" gutterBottom>
-                    {post.title}
+            <div className={classes.overlay}>
+                <Typography variant="h6">{post.name}</Typography>
+                <Typography variant="body2">
+                    {moment(post.createdAt).fromNow()}
                 </Typography>
-                <Divider />
-            </CardContent>
-
-            <CardActions className={classes.cardActions}>
-                <Tooltip title="Like Post">
+            </div>
+            {(user?.result?.googleId === post?.creator ||
+                user?.result?._id === post?.creator) && (
+                <div className={classes.overlay2}>
                     <Button
-                        color="primary"
-                        onClick={() => {
-                            dispatch(likePost(post._id));
-                        }}
+                        onClick={() => setCurrentId(post._id)}
+                        style={{ color: "white" }}
                         size="small"
-                        disabled={!user?.result}
                     >
-                        <Likes />
+                        <MoreHorizIcon fontSize="default" />
                     </Button>
-                </Tooltip>
+                </div>
+            )}
+            <div className={classes.details}>
+                <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    component="h2"
+                >
+                    {post.tags.map(tag => `#${tag} `)}
+                </Typography>
+            </div>
+            <Typography
+                className={classes.title}
+                gutterBottom
+                variant="h5"
+                component="h2"
+            >
+                {post.title}
+            </Typography>
+            <CardContent>
+                <Typography variant="body2" color="textSecondary" component="p">
+                    {post.message}
+                </Typography>
+            </CardContent>
+            <CardActions className={classes.cardActions}>
+                <Button
+                    size="small"
+                    color="primary"
+                    disabled={!user?.result}
+                    onClick={() => dispatch(likePost(post._id))}
+                >
+                    <Likes />
+                </Button>
                 {(user?.result?.googleId === post?.creator ||
                     user?.result?._id === post?.creator) && (
-                    <Tooltip title="Delete The Post" placement="top">
-                        <Button
-                            color="secondary"
-                            onClick={() => {
-                                setSnackOpen({
-                                    open: true,
-                                    severity: "warning",
-                                    message: "Post Will be Deleted.!!!",
-                                });
-                                dispatch(deletePost(post._id));
-                            }}
-                            size="small"
-                        >
-                            <Delete fontSize="small" /> Delete
-                        </Button>
-                    </Tooltip>
+                    <Button
+                        size="small"
+                        color="secondary"
+                        onClick={() => dispatch(deletePost(post._id))}
+                    >
+                        <DeleteIcon fontSize="small" /> Delete
+                    </Button>
                 )}
-
-                <Tooltip title="Show Details">
-                    <IconButton
-                        className={clsx(classes.expand, {
-                            [classes.expandOpen]: expanded,
-                        })}
-                        onClick={handleExpandClick}
-                        aria-expanded={expanded}
-                        aria-label="show more"
-                    >
-                        <ExpandMore />
-                    </IconButton>
-                </Tooltip>
             </CardActions>
-            <Collapse in={expanded} timeout="auto">
-                <CardContent>
-                    <Typography
-                        variant="body2"
-                        component="p"
-                        color="textSecondary"
-                    >
-                        {post.message}
-                    </Typography>
-                </CardContent>
-            </Collapse>
         </Card>
     );
 };
