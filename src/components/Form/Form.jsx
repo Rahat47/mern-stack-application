@@ -1,18 +1,11 @@
 import React, { useEffect, useState } from "react";
 import useStyles from "./styles";
-import {
-    TextField,
-    Button,
-    Typography,
-    Paper,
-    Snackbar,
-} from "@material-ui/core";
-import MuiAlert from "@material-ui/lab/Alert";
+import { TextField, Button, Typography, Paper } from "@material-ui/core";
 import FileBase64 from "react-file-base64";
 import { useDispatch, useSelector } from "react-redux";
 import { createPost, updatePost } from "../../actions/posts";
 
-const Form = ({ currentId, setCurrentId, setSnackOpen, snackOpen }) => {
+const Form = ({ currentId, setCurrentId }) => {
     const [postData, setPostData] = useState({
         title: "",
         message: "",
@@ -34,46 +27,16 @@ const Form = ({ currentId, setCurrentId, setSnackOpen, snackOpen }) => {
 
     const handleSubmit = e => {
         e.preventDefault();
-        if (!postData.title || !postData.message) {
-            setSnackOpen({
-                open: true,
-                severity: "warning",
-                message: "Creator, Title & Message is required.!!",
-            });
-            return;
-        }
+
         if (currentId) {
             dispatch(
                 updatePost(currentId, { ...postData, name: user?.result?.name })
             );
-            setSnackOpen({
-                open: true,
-                severity: "info",
-                message: "Post is being Edited",
-            });
         } else {
             dispatch(createPost({ ...postData, name: user?.result?.name }));
-            setSnackOpen({
-                open: true,
-                severity: "info",
-                message: "Post is being Created",
-            });
         }
 
         clear();
-    };
-    function Alert(props) {
-        return <MuiAlert elevation={6} variant="filled" {...props} />;
-    }
-
-    const handleClose = (event, reason) => {
-        if (reason === "clickaway") {
-            return;
-        }
-
-        setSnackOpen({
-            open: false,
-        });
     };
 
     const clear = () => {
@@ -99,16 +62,6 @@ const Form = ({ currentId, setCurrentId, setSnackOpen, snackOpen }) => {
 
     return (
         <Paper className={classes.paper}>
-            <Snackbar
-                open={snackOpen.open}
-                autoHideDuration={6000}
-                onClose={handleClose}
-                anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            >
-                <Alert onClose={handleClose} severity={snackOpen.severity}>
-                    {snackOpen.message}
-                </Alert>
-            </Snackbar>
             <form
                 onSubmit={e => handleSubmit(e)}
                 className={`${classes.root} ${classes.form}`}
@@ -177,11 +130,6 @@ const Form = ({ currentId, setCurrentId, setSnackOpen, snackOpen }) => {
                     color="secondary"
                     size="small"
                     onClick={() => {
-                        setSnackOpen({
-                            open: true,
-                            severity: "success",
-                            message: "Form Cleared!!",
-                        });
                         clear();
                     }}
                     fullWidth
